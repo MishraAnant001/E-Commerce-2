@@ -2,7 +2,7 @@ import { NewRequest } from "../interfaces";
 import { CartService } from "../services";
 import { Response } from "express";
 import { ErrorCodes } from "../utils/Status_Code";
-import { ApiError } from "../utils";
+import { ApiError, deleteError, errorResponseObject, fetchError, updateError } from "../utils";
 
 const service = new CartService();
 
@@ -12,7 +12,7 @@ export class CartController{
             const response = await service.getCart(req.user!.userid);
             res.status(response.statusCode).json(response)
         } catch (error:any) {
-            res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while getting the cart! : ${error.message}` })
+            res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${fetchError("cart")}: ${error.message}`))
         }
     }
 
@@ -22,9 +22,10 @@ export class CartController{
             const response = await service.addCartProduct(req.user!.userid,productid,quantity);
             res.status(response.statusCode).json(response)
         } catch (error:any) {
-            res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while updating the product! : ${error.message}` })
+            res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${updateError("product")}: ${error.message}`))
         }
     }
+    
     async updateCartProduct(req:NewRequest,res:Response){
         try {
             const {productid,quantity} = req.body;
@@ -32,13 +33,14 @@ export class CartController{
             res.status(response.statusCode).json(response)
         } catch (error:any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false, message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while updating the product! : ${error.message}` })
+                res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${updateError("product")} : ${error.message}`))
             }
             
         }
     }
+
     async deleteProduct(req:NewRequest,res:Response){
         try {
             const {productid,quantity} = req.body;
@@ -46,9 +48,9 @@ export class CartController{
             res.status(response.statusCode).json(response)
         } catch (error:any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false, message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while deleting the product! : ${error.message}` })
+                res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${deleteError("product")} : ${error.message}`))
             }
            
         }

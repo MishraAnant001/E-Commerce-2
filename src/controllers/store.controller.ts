@@ -1,7 +1,7 @@
 import { StoreService } from "../services";
 import { Request, Response } from "express";
 import { IStore, NewRequest } from "../interfaces";
-import { ApiError, ErrorCodes } from "../utils";
+import { ApiError, deleteError, ErrorCodes, errorResponseObject, fetchError, registerError, updateError } from "../utils";
 const service = new StoreService()
 export class StoreController {
     async getAllStores(req: Request, res: Response) {
@@ -9,7 +9,7 @@ export class StoreController {
             const response = await service.getAllStores();
             res.status(response.statusCode).json(response)
         } catch (error: any) {
-            res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while getting all stores! : ${error.message}` })
+            res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${fetchError("store")} : ${error.message}`))
         }
     }
 
@@ -24,7 +24,7 @@ export class StoreController {
 
         } catch (error: any) {
 
-            res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while registering the store! : ${error.message}` })
+            res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${registerError("store")} : ${error.message}`))
         }
     }
 
@@ -34,9 +34,9 @@ export class StoreController {
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false,message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(ErrorCodes.internalServerError).json({ success: false,message: `Error while getting the stores : ${error.message}` })
+                res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${fetchError("store")} : ${error.message}`))
             }
         }
     }
@@ -50,9 +50,9 @@ export class StoreController {
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false,message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(500).json({ success: false,message: `Error while updating the user! : ${error.message}` })
+                res.status(500).json(errorResponseObject(`${updateError("store")} : ${error.message}`))
             }
         }
     }
@@ -65,9 +65,9 @@ export class StoreController {
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false,message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(500).json({ success: false,message: `Error while deleting the store! : ${error.message}` })
+                res.status(500).json(errorResponseObject(`${deleteError("store")} : ${error.message}`))
             }
         }
     }
@@ -81,9 +81,9 @@ export class StoreController {
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false,message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(500).json({ success: false,message: `Error while deleting the store! : ${error.message}` })
+                res.status(500).json(errorResponseObject(`${deleteError("store")} : ${error.message}`))
             }
         }
     }

@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 import { IProduct } from "../interfaces";
 import { Product, Store } from "../models";
 import { ParsedQs } from 'qs'
-import { ApiError, ApiResponse, ErrorCodes, SuccessCodes,dynamicSearchandFilter,dynamicSort } from "../utils";
-
+import { ApiError, ApiResponse, ErrorCodes, SuccessCodes,dynamicSearchandFilter,dynamicSort,fetchSuccess,registerSuccess,invalidMongoId,notFound,updateSuccess,deleteSuccess } from "../utils";
 export class ProductService{
     async getAllProducts(filters:ParsedQs) {
         let { search, sort, minPrice, maxPrice, category } = filters
@@ -55,17 +54,17 @@ export class ProductService{
               }
         ])
         if (data.length==0) {
-            throw new ApiError(ErrorCodes.notFound, "No Product found")
+            throw new ApiError(ErrorCodes.notFound, notFound("product"))
         }
         // const query = buildQuery(filters)
-        return new ApiResponse(SuccessCodes.ok, data, "Products fetched successfully");
+        return new ApiResponse(SuccessCodes.ok, data, fetchSuccess("products"));
     }
 
 
     async createProduct( productdata: IProduct) {
         const data = await Product.create(productdata)
         // console.log(data)
-        return new ApiResponse(SuccessCodes.created, data, "Product added successfully")
+        return new ApiResponse(SuccessCodes.created, data, registerSuccess("product"))
     }
 
     async getProduct(sellerid: string) {
@@ -73,7 +72,7 @@ export class ProductService{
             sellerid:sellerid
         })
         if (stores.length==0) {
-            throw new ApiError(ErrorCodes.notFound, "No Store found")
+            throw new ApiError(ErrorCodes.notFound,notFound("store"))
         }
 
         const storesids = stores.map((item)=>{
@@ -83,31 +82,31 @@ export class ProductService{
         const data = await Product.find({ storeid: { $in: storesids } })
         // const data = await Product.find({}).select("name price category stock");
         if (data.length==0) {
-            throw new ApiError(ErrorCodes.notFound, "No Product found")
+            throw new ApiError(ErrorCodes.notFound, notFound("product"))
         }
-        return new ApiResponse(SuccessCodes.ok, data, "Products fetched successfully");
+        return new ApiResponse(SuccessCodes.ok, data, fetchSuccess("products"));
     }
 
     async updateProduct(id: string, productdata: IProduct) {
         if (!mongoose.isValidObjectId(id)) {
-            throw new ApiError(ErrorCodes.badRequest, "Please provide valid product id ")
+            throw new ApiError(ErrorCodes.badRequest, invalidMongoId("product"))
         }
         const data = Product.findByIdAndUpdate(id,productdata);
         if (!data) {
-            throw new ApiError(ErrorCodes.notFound, "No Product found")
+            throw new ApiError(ErrorCodes.notFound,notFound("product"))
         }
-        return new ApiResponse(SuccessCodes.ok, data, "Product updated successfully");
+        return new ApiResponse(SuccessCodes.ok, data,updateSuccess("product"));
 
     }
     async deleteProduct(id: string) {
         if (!mongoose.isValidObjectId(id)) {
-            throw new ApiError(ErrorCodes.badRequest, "Please provide valid product id ")
+            throw new ApiError(ErrorCodes.badRequest,invalidMongoId("product"))
         }
         const data = Product.findByIdAndDelete(id);
         if (!data) {
-            throw new ApiError(ErrorCodes.notFound, "No Product found")
+            throw new ApiError(ErrorCodes.notFound,notFound("product"))
         }
-        return new ApiResponse(SuccessCodes.ok, data, "Product deleted successfully");
+        return new ApiResponse(SuccessCodes.ok, data, deleteSuccess("product"));
     }
     
 }

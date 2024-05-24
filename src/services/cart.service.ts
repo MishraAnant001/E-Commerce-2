@@ -1,5 +1,5 @@
 import { Cart, CartProduct } from "../models";
-import { ApiError, ApiResponse, ErrorCodes, SuccessCodes } from "../utils";
+import { ApiError, ApiResponse, deleteSuccess, ErrorCodes, fetchSuccess, notFound, SuccessCodes, updateSuccess } from "../utils";
 
 export class CartService {
     async getCart(id: string) {
@@ -47,7 +47,7 @@ export class CartService {
           for(let item of products){
             total+= item.subtotal
           }
-        return new ApiResponse(SuccessCodes.ok, {...products,total:total}, "Cart fetched successfully!")
+        return new ApiResponse(SuccessCodes.ok, {...products,total:total}, fetchSuccess("cart"))
     }
 
     async addCartProduct(id: string, productid: string, quantity: number) {
@@ -70,7 +70,7 @@ export class CartService {
                 cartid: data!._id
             })
         }
-        return new ApiResponse(SuccessCodes.ok, product, "Product updated successfully!")
+        return new ApiResponse(SuccessCodes.ok, product,updateSuccess("product"))
     }
     async updateCartProduct(id: string, productid: string, quantity: number) {
         const data = await Cart.findOne({ userid: id });
@@ -80,7 +80,7 @@ export class CartService {
         })
         let product: any = null;
         if (!verifyProduct) {
-            throw new ApiError(ErrorCodes.notFound, "No Product found")
+            throw new ApiError(ErrorCodes.notFound, notFound("product"))
         } else {
             product = await CartProduct.findByIdAndUpdate(verifyProduct._id, {
                 productid: productid,
@@ -88,7 +88,7 @@ export class CartService {
                 cartid: data!._id
             })
         }
-        return new ApiResponse(SuccessCodes.ok, product, "Product updated successfully!")
+        return new ApiResponse(SuccessCodes.ok, product, updateSuccess("product"))
     }
 
     async deleteProduct(id: string, productid: string) {
@@ -98,9 +98,9 @@ export class CartService {
             cartid: data!._id
         })
         if (!verifyProduct) {
-            throw new ApiError(ErrorCodes.notFound, "No Product found")
+            throw new ApiError(ErrorCodes.notFound, notFound("product"))
         }
         const product = await CartProduct.findByIdAndDelete(verifyProduct._id)
-        return new ApiResponse(SuccessCodes.ok, product, "Product deleted successfully!")
+        return new ApiResponse(SuccessCodes.ok, product, deleteSuccess("product"))
     }
 }

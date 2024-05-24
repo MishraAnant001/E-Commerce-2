@@ -1,7 +1,7 @@
 import { NewRequest } from "../interfaces";
 import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
-import { ErrorCodes } from "../utils";
+import { adminsAllowed, adminsOrSellersAllowed, authenticationError, ErrorCodes, errorResponseObject, sellersAllowed, unauthorized, usersAllowed } from "../utils";
 export class Authentication{
     async authenticateUser(req:NewRequest,res:Response,next:NextFunction){
         try {
@@ -11,10 +11,7 @@ export class Authentication{
                 const verify:any = jwt.verify(token,secretkey);
                 const{userid,type} = verify;
                 if(type!="user"){
-                    return res.status(ErrorCodes.unauthorized).json({
-                        success:false,
-                        message:"only users are allowed !"
-                    })
+                    return res.status(ErrorCodes.unauthorized).json(errorResponseObject(usersAllowed))
                 }
                 req.user={
                     userid:userid,
@@ -22,16 +19,10 @@ export class Authentication{
                 }
                 next()
             }else{
-                return res.status(ErrorCodes.unauthorized).json({
-                    success:false,
-                    message:"unauthorized access!"
-                })
+                return res.status(ErrorCodes.unauthorized).json(errorResponseObject(unauthorized))
             }
         } catch (error:any) {
-            return res.status(ErrorCodes.internalServerError).json({
-                success:false,
-                message:`Error while authentication : ${error.message}`
-            })
+            return res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${authenticationError}: ${error.message}`))
         }
     }
     async authenticateSeller(req:NewRequest,res:Response,next:NextFunction){
@@ -42,10 +33,7 @@ export class Authentication{
                 const verify:any = jwt.verify(token,secretkey);
                 const{userid,type} = verify;
                 if(type!="seller"){
-                    return res.status(ErrorCodes.unauthorized).json({
-                        success:false,
-                        message:"only sellers are allowed !"
-                    })
+                    return res.status(ErrorCodes.unauthorized).json(errorResponseObject(sellersAllowed))
                 }
                 req.user={
                     userid:userid,
@@ -53,16 +41,10 @@ export class Authentication{
                 }
                 next()
             }else{
-                res.status(ErrorCodes.unauthorized).json({
-                    success:false,
-                    message:"unauthorized access!"
-                })
+                res.status(ErrorCodes.unauthorized).json(errorResponseObject(unauthorized))
             }
         } catch (error:any) {
-            return res.status(ErrorCodes.internalServerError).json({
-                success:false,
-                message:`Error while authentication : ${error.message}`
-            })
+            return res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${authenticationError}: ${error.message}`))
         }
     }
     async authenticateSellerOrAdmin(req:NewRequest,res:Response,next:NextFunction){
@@ -79,24 +61,15 @@ export class Authentication{
                     }
                 }else{
 
-                    return res.status(ErrorCodes.unauthorized).json({
-                        success:false,
-                        message:"only sellers and admins are allowed !"
-                    })
+                    return res.status(ErrorCodes.unauthorized).json(errorResponseObject(adminsOrSellersAllowed))
                 }
                 
                 next()
             }else{
-                res.status(ErrorCodes.unauthorized).json({
-                    success:false,
-                    message:"unauthorized access!"
-                })
+                res.status(ErrorCodes.unauthorized).json(errorResponseObject(unauthorized))
             }
         } catch (error:any) {
-            return res.status(ErrorCodes.internalServerError).json({
-                success:false,
-                message:`Error while authentication : ${error.message}`
-            })
+            return res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${authenticationError}: ${error.message}`))
         }
     }
     async authenticateAdmin(req:NewRequest,res:Response,next:NextFunction){
@@ -107,10 +80,7 @@ export class Authentication{
                 const verify:any = jwt.verify(token,secretkey);
                 const{userid,type} = verify;
                 if(type!="admin"){
-                    return res.status(ErrorCodes.unauthorized).json({
-                        success:false,
-                        message:"only admins are allowed !"
-                    })
+                    return res.status(ErrorCodes.unauthorized).json(errorResponseObject(adminsAllowed))
                 }
                 req.user={
                     userid:userid,
@@ -118,16 +88,10 @@ export class Authentication{
                 }
                 next()
             }else{
-                return res.status(ErrorCodes.unauthorized).json({
-                    success:false,
-                    message:"unauthorized access!"
-                })
+                return res.status(ErrorCodes.unauthorized).json(errorResponseObject(unauthorized))
             }
         } catch (error:any) {
-            return res.status(ErrorCodes.internalServerError).json({
-                success:false,
-                message:`Error while authentication : ${error.message}`
-            })
+            return res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${authenticationError}: ${error.message}`))
         }
     }
 }

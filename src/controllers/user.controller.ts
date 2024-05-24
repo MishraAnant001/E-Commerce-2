@@ -1,7 +1,7 @@
 import { UserService } from "../services";
 import { Request, Response } from "express";
 import { IUser, IUserTemp } from "../interfaces";
-import { ApiError, ErrorCodes } from "../utils";
+import { ApiError, deleteError, ErrorCodes, errorResponseObject, fetchError, registerError, updateError } from "../utils";
 const service = new UserService()
 export class UserController {
     async getAllUsers(req: Request, res: Response) {
@@ -10,7 +10,7 @@ export class UserController {
             res.status(response.statusCode).json(response)
 
         } catch (error: any) {
-            res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while getting all users! : ${error.message}` })
+            res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${fetchError("users")} : ${error.message}`))
         }
     }
 
@@ -22,7 +22,7 @@ export class UserController {
             res.status(response.statusCode).json(response)
 
         } catch (error: any) {
-            res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while registering the user! : ${error.message}` })
+            res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${registerError("user")}: ${error.message}`))
         }
     }
 
@@ -34,9 +34,9 @@ export class UserController {
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false, message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while getting the user : ${error.message}` })
+                res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${fetchError("user")} : ${error.message}`))
             }
         }
     }
@@ -49,9 +49,9 @@ export class UserController {
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false, message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(500).json({ success: false, message: `Error while updating the user! : ${error.message}` })
+                res.status(500).json(errorResponseObject(`${updateError("user")} : ${error.message}`))
             }
         }
     }
@@ -64,9 +64,9 @@ export class UserController {
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false, message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(500).json({ success: false, message: `Error while deleting the user! : ${error.message}` })
+                res.status(500).json(errorResponseObject( `${deleteError("user")} : ${error.message}`))
             }
         }
     }

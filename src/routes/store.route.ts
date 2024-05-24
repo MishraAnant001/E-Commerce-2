@@ -8,5 +8,3 @@ storeRouter.route("/").get(auth.authenticateAdmin,controller.getAllStores).post(
 storeRouter.route("/seller").get(auth.authenticateSeller,controller.getStore);
 storeRouter.route("/seller/:id").put(auth.authenticateSeller,controller.updateStore).delete(auth.authenticateSeller,controller.deleteStoreBySeller)
 storeRouter.route("/:id").delete(auth.authenticateAdmin,controller.deleteStoreByAdmin)
-
-

@@ -1,5 +1,5 @@
 import { LoginService } from "../services";
-import { ApiError, ErrorCodes } from "../utils";
+import { ApiError, ErrorCodes, errorResponseObject, loginError } from "../utils";
 import { Request,Response } from "express";
 const service = new LoginService()
 export class LoginController{
@@ -12,9 +12,9 @@ export class LoginController{
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false,message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(ErrorCodes.internalServerError).json({ success: false,message: `Error while logging in : ${error.message}` })
+                res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${loginError} : ${error.message}`))
             }
         }
     }

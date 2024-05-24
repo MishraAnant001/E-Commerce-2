@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { IOrderProduct } from "../interfaces";
 import { Order, OrderProduct } from "../models";
-import { ApiError, ApiResponse } from "../utils";
+import { ApiError, ApiResponse,fetchSuccess,invalidMongoId,notFound,orderCancelSuccess, orderPlaceSuccess } from "../utils";
 import { ErrorCodes, SuccessCodes } from "../utils/Status_Code";
 
 export class OrderService {
@@ -23,12 +23,12 @@ export class OrderService {
         // console.log(total)
         order.total = total;
         await order.save()
-        return new ApiResponse(SuccessCodes.ok, order, "Order placed successfully!")
+        return new ApiResponse(SuccessCodes.ok, order,orderPlaceSuccess)
     }
 
     async getOrder(userid: string, orderid: string) {
         if (!mongoose.isValidObjectId(orderid)) {
-            throw new ApiError(ErrorCodes.badRequest, "Please provide valid order id ")
+            throw new ApiError(ErrorCodes.badRequest, invalidMongoId("order"))
         }
         const order = await Order.findOne({
             _id: orderid,
@@ -36,7 +36,7 @@ export class OrderService {
         })
 
         if (!order) {
-            throw new ApiError(ErrorCodes.notFound, "No order found")
+            throw new ApiError(ErrorCodes.notFound, notFound("order"))
         }
         else {
             const orderProducts = await OrderProduct.aggregate([
@@ -92,7 +92,7 @@ export class OrderService {
             // const orderProducts=await OrderProduct.find({orderid:orderid})
             // console.log(orderProducts)
             const data = { orderProducts,total:order.total,iscancelled:order.iscancelled }
-            return new ApiResponse(SuccessCodes.ok, data, "Order fetched successfully!")
+            return new ApiResponse(SuccessCodes.ok, data,fetchSuccess("order"))
         }
 
 
@@ -103,14 +103,14 @@ export class OrderService {
             userid: userid
         })
         if (!order) {
-            throw new ApiError(ErrorCodes.notFound, "No order found")
+            throw new ApiError(ErrorCodes.notFound, notFound("order"))
         }
-        return new ApiResponse(SuccessCodes.ok, order, "Orders fetched successfully!")
+        return new ApiResponse(SuccessCodes.ok, order, fetchSuccess("orders"))
     }
 
     async cancelOrder(userid: string, orderid: string) {
         if (!mongoose.isValidObjectId(orderid)) {
-            throw new ApiError(ErrorCodes.badRequest, "Please provide valid order id ")
+            throw new ApiError(ErrorCodes.badRequest, invalidMongoId("order"))
         }
         const order = await Order.findByIdAndUpdate(orderid, {
             iscancelled: true
@@ -118,6 +118,6 @@ export class OrderService {
         if (!order) {
             throw new ApiError(ErrorCodes.notFound, "No order found")
         }
-        return new ApiResponse(SuccessCodes.ok, order, "Order cancelled successfully!")
+        return new ApiResponse(SuccessCodes.ok, order,orderCancelSuccess)
     }
 }

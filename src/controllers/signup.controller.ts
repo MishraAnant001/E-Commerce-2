@@ -1,6 +1,6 @@
 import { IUser } from "../interfaces";
 import { UserService } from "../services";
-import { ErrorCodes } from "../utils";
+import { ErrorCodes, errorResponseObject, registerError } from "../utils";
 import { Request, Response } from "express";
 
 const service = new UserService()
@@ -15,7 +15,7 @@ export class SignupController {
 
         } catch (error: any) {
 
-            res.status(500).json({ success: false, message: `Error while registering the user! : ${error.message}` })
+            res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${registerError("user")} : ${error.message}`))
 
         }
     }

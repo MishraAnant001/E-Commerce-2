@@ -1,6 +1,6 @@
 import { CategoryService } from "../services";
 import { Request, Response } from "express";
-import { ApiError, ErrorCodes } from "../utils";
+import { ApiError, deleteError, ErrorCodes, errorResponseObject, fetchError, registerError, updateError } from "../utils";
 const service = new CategoryService()
 export class CategoryController {
     async getAllCategories(req: Request, res: Response) {
@@ -9,7 +9,7 @@ export class CategoryController {
             res.status(response.statusCode).json(response)
 
         } catch (error: any) {
-            res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while getting all categories! : ${error.message}` })
+            res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${fetchError("categories")}: ${error.message}`))
         }
     }
 
@@ -20,7 +20,7 @@ export class CategoryController {
             res.status(response.statusCode).json(response)
 
         } catch (error: any) {
-            res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while adding the Category! : ${error.message}` })
+            res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${registerError("category")} : ${error.message}`))
         }
     }
     async updateCategory(req: Request, res: Response) {
@@ -32,9 +32,9 @@ export class CategoryController {
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false, message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(500).json({ success: false, message: `Error while updating the category! : ${error.message}` })
+                res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${updateError("category")} : ${error.message}`))
             }
         }
     }
@@ -47,9 +47,9 @@ export class CategoryController {
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false, message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(500).json({ success: false, message: `Error while deleting the category! : ${error.message}` })
+                res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${deleteError("category")} : ${error.message}`))
             }
         }
     }

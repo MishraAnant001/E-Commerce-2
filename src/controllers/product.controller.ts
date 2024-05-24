@@ -1,7 +1,7 @@
 import { ProductService } from "../services";
 import { Request, Response } from "express";
 import { IProduct, NewRequest } from "../interfaces";
-import { ApiError, ErrorCodes } from "../utils";
+import { ApiError, deleteError, ErrorCodes, errorResponseObject, fetchError, registerError, updateError } from "../utils";
 const service = new ProductService();
 export class ProductController{
     async getAllproducts(req: Request, res: Response) {
@@ -10,9 +10,9 @@ export class ProductController{
             res.status(response.statusCode).json(response)
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false,message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while getting all products! : ${error.message}` })
+                res.status(ErrorCodes.internalServerError).json(errorResponseObject( `${fetchError("products")}: ${error.message}`))
             }
             
         }
@@ -24,7 +24,7 @@ export class ProductController{
             return res.status(response.statusCode).json(response)
         } catch (error: any) {
 
-            res.status(ErrorCodes.internalServerError).json({ success: false, message: `Error while adding the product! : ${error.message}` })
+            res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${registerError("product")} : ${error.message}`))
         }
     }
 
@@ -34,9 +34,9 @@ export class ProductController{
             res.status(response.statusCode).json(response);
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false,message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(ErrorCodes.internalServerError).json({ success: false,message: `Error while getting the products : ${error.message}` })
+                res.status(ErrorCodes.internalServerError).json(errorResponseObject(`${fetchError("product")}: ${error.message}`))
             }
         }
     }
@@ -49,9 +49,9 @@ export class ProductController{
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false,message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(500).json({ success: false,message: `Error while updating the Product! : ${error.message}` })
+                res.status(500).json(errorResponseObject(`${updateError("product")} : ${error.message}`))
             }
         }
     }
@@ -64,9 +64,9 @@ export class ProductController{
 
         } catch (error: any) {
             if (error instanceof ApiError) {
-                res.status(error.statusCode).json({ success: false,message: error.message })
+                res.status(error.statusCode).json(errorResponseObject(error.message))
             } else {
-                res.status(500).json({ success: false,message: `Error while deleting the product! : ${error.message}` })
+                res.status(500).json(errorResponseObject(`${deleteError("product")} : ${error.message}`))
             }
         }
     }
